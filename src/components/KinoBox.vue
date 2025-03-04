@@ -22,7 +22,7 @@ onMounted(async () => {
 
 <style scoped>
 .kinobox_player {
-    width: 90vw;
-    height: 90vh;
+    width: 100%;
+    height: 100%;
 }
 </style>
