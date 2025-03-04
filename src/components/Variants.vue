@@ -55,4 +55,33 @@ li {
     flex-direction: column;
     gap: 10px;
 }
+
+@media (max-width: 600px) {
+    .variants-container {
+        padding: 10px;
+        margin-top: 10px;
+        max-width: 100%;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    ol {
+        gap: 15px;
+    }
+
+    li {
+        gap: 5px;
+    }
+
+    button {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .description {
+        font-size: 12px;
+    }
+}
 </style>

@@ -77,4 +77,15 @@ const backToSearch = () => {
     top: 0;
     padding: 5px;
 }
+
+@media (max-width: 600px) {
+  
+
+    button {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+
+}
 </style>
