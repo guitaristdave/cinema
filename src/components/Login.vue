@@ -1,46 +1,55 @@
 <template>
     <div class="login-container">
         <h2>{{ props.title }}</h2>
-        <input type="text" placeholder="Логин" v-model="login" @keyup.enter="submit" class="input-field">
+        <input type="email" placeholder="E-mail" v-model="email" @keyup.enter="submit" class="input-field">
         <input type="password" placeholder="Пароль" v-model="password" @keyup.enter="submit" class="input-field">
         <p class="error" v-if="error">{{ error }}</p>
-        <button @click="submit" class="submit-btn">Войти</button>
+        <div class="buttons">
+            <button @click="submit" class="submit-btn">Войти</button>
+            <button class="submit-btn reg-btn" @click="$emit('registration')">Регистрация</button>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { LOGIN, PASSWORD } from '../data/creds';
+import { login as apiLogin } from '../api/mokky';
 
 const props = defineProps({
     title: String
 });
 
 const emit = defineEmits([
-    'login-success'
+    'login-success',
+    'registration'
 ]);
 
-const login = ref('');
+const email = ref('');
 const password = ref('');
 const error = ref(null);
 
-const submit = () => {
-    if (login.value === LOGIN && password.value === PASSWORD) {
-        error.value = null;
-        emit('login-success');
-        localStorage.setItem('logged', 'true');
-    } else {
-        error.value = 'Invalid login or password';
-        login.value = '';
-        password.value = '';
+const prepareData = () => {
+    const data = {
+        email: email.value,
+        password: password.value,
     }
-};
+    return data;
+}
 
-onMounted(() => {
-    if (localStorage.getItem('logged') === 'true') {
+const submit = async () => {
+    const data = prepareData();
+    const response = await apiLogin(data);
+
+    if ('token' in response) {
+        localStorage.setItem('token', response.token);
         emit('login-success');
+    } else {
+        error.value = 'Неверные данные';
     }
-});
+
+}
+
+
 </script>
 
 <style scoped>
@@ -102,6 +111,17 @@ h2 {
 
 .submit-btn:focus {
     outline: none;
+}
+
+.buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    justify-content: space-between;
+}
+
+.reg-btn {
+    background-color: #2baaff;
 }
 
 @media (max-width: 500px) {

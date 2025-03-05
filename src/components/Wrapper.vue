@@ -1,66 +1,103 @@
 <template>
     <div class="wrapper">
         <div class="buttons">
-        
-            <button v-if="!showLogin" @click="logout" class="action-btn">
+            <button v-if="!screens.login && !screens.register" @click="logout" class="action-btn">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </button>
-            <button v-if="showKinoBox || showVariants" @click="backToSearch" class="action-btn">
+            <button v-if="screens.kinoBox || screens.variants" @click="backToSearch" class="action-btn">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </div>
-        <Login title="Авторизация" v-if="showLogin" @login-success="loginHandler" />
-        <Search title="Выберите фильм" v-if="showSearch" @search="searchHandler" />
-        <Variants title="Выберите нужный вариант" v-if="showVariants" :movies="movies" @kinopoiskId="kinopoiskHandler" />
-        <KinoBox v-if="showKinoBox" :movieId="movieId" />
+        <Login title="Авторизация" v-if="screens.login" @login-success="loginHandler"
+            @registration="registrationHandler" />
+        <Register @register-success="registerHandler" v-if="screens.register" />
+        <Search :title="`Привет ${username}, выбери фильм`" v-if="screens.search" @search="searchHandler" />
+        <Variants title="Выберите нужный вариант" v-if="screens.variants" :movies="movies"
+            @kinopoiskId="kinopoiskHandler" />
+        <KinoBox v-if="screens.kinoBox" :movieId="movieId" />
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import Login from './Login.vue';
 import Search from './Search.vue';
 import KinoBox from './KinoBox.vue';
 import Variants from './Variants.vue';
+import Register from './Register.vue';
+import { checkAuth } from '../api/mokky';
 
-const showLogin = ref(true);
-const showSearch = ref(false);
-const showKinoBox = ref(false);
-const showVariants = ref(false);
+
+const screens = reactive({
+    login: false,
+    register: false,
+    search: false,
+    kinoBox: false,
+    variants: false
+})
 const movies = ref([]);
 const movieId = ref('');
+const username = ref('');
+
+const manageScreens = (screen) => {
+    for (const key in screens) {
+        screens[key] = key === screen;
+    }
+}
 
 const loginHandler = () => {
-    showLogin.value = false;
-    showSearch.value = true;
+    manageScreens('search')
 }
 
 const searchHandler = (movieList) => {
     movies.value = movieList;
-    showSearch.value = false;
-    showVariants.value = true;
+    manageScreens('variants');
 }
 
 const kinopoiskHandler = (kinopoiskId) => {
     movieId.value = kinopoiskId.toString();
-    showVariants.value = false;
-    showKinoBox.value = true;
+    manageScreens('kinoBox');
 }
 
 const logout = () => {
-    showLogin.value = true;
-    showSearch.value = false;
-    showKinoBox.value = false;
-    showVariants.value = false;
-    localStorage.removeItem('logged');
+    manageScreens('login');
+    localStorage.removeItem('token');
 }
 
 const backToSearch = () => {
-    showSearch.value = true;
-    showKinoBox.value = false;
-    showVariants.value = false;
-    showLogin.value = false;
+    manageScreens('search');
 }
+
+const registerHandler = () => {
+    manageScreens('login');
+}
+
+const registrationHandler = () => {
+    manageScreens('register');
+}
+
+onMounted(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        checkAuth(token)
+            .then(data => {
+                if (data?.fullName) {
+                    username.value = data.fullName;
+                    manageScreens('search'); // Показываем экран поиска после успешной авторизации
+                } else {
+                    manageScreens('login'); // Если данные некорректные — отправляем на логин
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                manageScreens('login'); // В случае ошибки тоже отправляем на логин
+            });
+    } else {
+        manageScreens('login'); // Если нет токена — показываем логин
+    }
+});
+
+
 </script>
 
 <style scoped>

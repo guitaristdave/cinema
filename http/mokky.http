@@ -1,0 +1,29 @@
+### Register
+POST https://70df281730fe0425.mokky.dev/register
+Accept: application/json
+Content-Type: application/json
+
+{
+    "fullName": "Вася Пупкин",
+    "email": "user@test.com",
+    "password": "123456"
+}
+
+
+###Auth
+POST https://70df281730fe0425.mokky.dev/auth
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "david@akunts.ru",
+    "password": "Aa1234"
+}
+
+
+### Check Auth
+GET https://70df281730fe0425.mokky.dev/auth_me
+Authorization: Bearer <token>
+
+### Users
+GET https://70df281730fe0425.mokky.dev/users
