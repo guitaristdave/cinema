@@ -1,20 +1,21 @@
 <template>
     <div class="wrapper">
         <div class="buttons">
-            <button v-if="!screens.login && !screens.register" @click="logout" class="action-btn">
+            <button v-if="!screens.login && !screens.register" @click="logout" class="action-btn" title="Выход">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </button>
-            <button v-if="screens.kinoBox || screens.variants" @click="backToSearch" class="action-btn">
+            <button v-if="screens.kinoBox || screens.variants" @click="backToSearch" class="action-btn" title="Поиск">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </div>
         <Login title="Авторизация" v-if="screens.login" @login-success="loginHandler"
             @registration="registrationHandler" />
         <Register @register-success="registerHandler" v-if="screens.register" />
-        <Search :title="`Привет ${username}, выбери фильм`" v-if="screens.search" @search="searchHandler" />
+        <Search title="Выбери фильм" v-if="screens.search" @search="searchHandler" />
         <Variants title="Выберите нужный вариант" v-if="screens.variants" :movies="movies"
             @kinopoiskId="kinopoiskHandler" />
         <KinoBox v-if="screens.kinoBox" :movieId="movieId" />
+        <History v-if="!screens.login && !screens.register && !screens.kinoBox" @watchMovie="kinopoiskHandler" />
     </div>
 </template>
 
@@ -26,6 +27,7 @@ import KinoBox from './KinoBox.vue';
 import Variants from './Variants.vue';
 import Register from './Register.vue';
 import { checkAuth } from '../api/mokky';
+import History from './History.vue';
 
 
 const screens = reactive({
@@ -37,7 +39,6 @@ const screens = reactive({
 })
 const movies = ref([]);
 const movieId = ref('');
-const username = ref('');
 
 const manageScreens = (screen) => {
     for (const key in screens) {
@@ -62,6 +63,7 @@ const kinopoiskHandler = (kinopoiskId) => {
 const logout = () => {
     manageScreens('login');
     localStorage.removeItem('token');
+    localStorage.removeItem('user_id');
 }
 
 const backToSearch = () => {
@@ -78,12 +80,13 @@ const registrationHandler = () => {
 
 onMounted(() => {
     const token = localStorage.getItem('token');
+    const lastScreen = localStorage.getItem('currentScreen');
+    const lastMovie = localStorage.getItem('lastMovie');
     if (token) {
         checkAuth(token)
             .then(data => {
                 if (data?.fullName) {
-                    username.value = data.fullName;
-                    manageScreens('search'); // Показываем экран поиска после успешной авторизации
+                    manageScreens('search'); // Открываем последний экран или поиск по умолчанию
                 } else {
                     manageScreens('login'); // Если данные некорректные — отправляем на логин
                 }

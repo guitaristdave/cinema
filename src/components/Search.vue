@@ -27,6 +27,12 @@ const search = async () => {
         return;
     }
     movies.value = await searchIds(movieName.value); // Ожидаем завершения запроса
+    if (!movies.value.length) {
+        error.value = 'Фильм не найден';
+        movies.value = [];
+        movieName.value = '';
+        return;
+    };
     emit('search', movies.value);
     movieName.value = '';
 };

@@ -3,7 +3,7 @@
         <h2>{{ props.title }}</h2>
         <ol class="movie-list">
             <li v-for="movie in props.movies" :key="movie.id" class="movie-item">
-                <button @click="$emit('kinopoiskId', movie.id)" class="movie-btn">
+                <button @click="$emit('kinopoiskId', movie.id); addHistory(movie)" class="movie-btn">
                     {{ movie.name }} ({{ movie.year }})
                 </button>
                 <p class="description" :title="movie.description">{{ movie.description }}</p>
@@ -13,6 +13,7 @@
 </template>
 
 <script setup>
+import { addToHistory } from '../api/mokky';
 const props = defineProps({
     title: String,
     movies: Array
@@ -21,6 +22,13 @@ const props = defineProps({
 const emit = defineEmits([
     'kinopoiskId',
 ])
+
+const addHistory = async (movie) => {
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+        await addToHistory(userId, movie.id, movie.name);
+    }
+}
 </script>
 
 <style scoped>

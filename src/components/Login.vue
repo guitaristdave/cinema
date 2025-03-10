@@ -42,6 +42,7 @@ const submit = async () => {
 
     if ('token' in response) {
         localStorage.setItem('token', response.token);
+        localStorage.setItem('user_id', response.data.id);
         emit('login-success');
     } else {
         error.value = 'Неверные данные';
