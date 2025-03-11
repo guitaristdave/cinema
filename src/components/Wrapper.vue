@@ -80,8 +80,6 @@ const registrationHandler = () => {
 
 onMounted(() => {
     const token = localStorage.getItem('token');
-    const lastScreen = localStorage.getItem('currentScreen');
-    const lastMovie = localStorage.getItem('lastMovie');
     if (token) {
         checkAuth(token)
             .then(data => {

@@ -5,7 +5,7 @@
             <li v-for="movie in history">
                 <div class="buttons">
                     <button class="movieBtn" @click="watchMovie(movie.kinopoisk_id)">{{ movie.movie_name }}</button>
-                    <button class="deleteBtn" @click="deleteHistoryItem(movie.id)">❌</button>
+                    <button class="deleteBtn" @click="removeFromHistory(movie.id)">❌</button>
                 </div>
                 <p>{{ dateFormatter(movie.date) }}</p>
             </li>
@@ -50,14 +50,21 @@ const fetchHistory = async () => {
     }
 };
 
+const removeFromHistory = async (movieId) => {
+    try {
+        await deleteHistoryItem(movieId);
+        fetchHistory();
+    } catch (error) {
+        console.error('Ошибка удаления из истории:', error);
+    }
+}
+
 const watchMovie = (movieId) => {
     emit('watchMovie', movieId);
 }
 
 watch(currentPage, fetchHistory);
-watch(history, () => {
-    fetchHistory();
-})
+
 onMounted(fetchHistory);
 
 </script>

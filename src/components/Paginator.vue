@@ -7,7 +7,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
     modelValue: { type: Number, required: true }, // Теперь это v-model
