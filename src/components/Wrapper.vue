@@ -84,6 +84,7 @@ onMounted(() => {
         checkAuth(token)
             .then(data => {
                 if (data?.fullName) {
+                    localStorage.setItem('user_id', data.id);
                     manageScreens('search'); // Открываем последний экран или поиск по умолчанию
                 } else {
                     manageScreens('login'); // Если данные некорректные — отправляем на логин
