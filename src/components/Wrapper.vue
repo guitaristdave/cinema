@@ -105,7 +105,7 @@ onMounted(() => {
 <style scoped>
 .wrapper {
     max-width: 800px;
-    margin: 300px auto;
+    margin: 50px auto;
     padding: 20px;
     display: flex;
     flex-direction: column;
